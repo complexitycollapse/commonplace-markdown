@@ -1,0 +1,20 @@
+{
+  "name": "commonplace-markdown-app",
+  "version": "1.0.0",
+  "description": "The first ever Commonplace app, converting markdown to Commonplace",
+  "main": "main/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "test": "jest --config ../../jest.config.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^31.3.1"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "commonplace-markdown": "file:../commonplace-markdown"
+  }
+}

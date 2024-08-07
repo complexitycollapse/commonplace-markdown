@@ -1,0 +1,13 @@
+{
+  "name": "commonplace-markdown",
+  "version": "1.0.0",
+  "description": "A package with tools for converting markdown to Commonplace",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest --config ../../jest.config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
