@@ -5,8 +5,7 @@
   "main": "main/main.js",
   "type": "module",
   "scripts": {
-    "start": "electron .",
-    "test": "jest --config ../jest.config.cjs"
+    "start": "electron ."
   },
   "author": "",
   "license": "ISC",

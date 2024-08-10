@@ -5,9 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "jest --config ../jest.config.cjs"
+    "test": "node ..\\..\\just\\just\\index.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "just": "file:../../just/just"
+  }
 }
