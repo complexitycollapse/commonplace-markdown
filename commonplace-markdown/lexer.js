@@ -8,7 +8,7 @@ function lexHeading(level) {
   }
 }
 
-function createList(listType) {
+function lexList(listType) {
   return (_, indent, marker, content) => ({
     type: listType,
     indent: indent.length,
@@ -28,8 +28,8 @@ const lineRules = [
   { regex: /^#### (.*$)/, replacement: lexHeading(4) },
   { regex: /^##### (.*$)/, replacement: lexHeading(5) },
   { regex: /^###### (.*$)/, replacement: lexHeading(6) },
-  { regex: /(^ *)(\*|-) (.*$)/, replacement: createList('ul') },
-  { regex: /(^ *)([0-9]\.) (.*$)/, replacement: createList('ol') },
+  { regex: /(^ *)(\*|-) (.*$)/, replacement: lexList('ul') },
+  { regex: /(^ *)([0-9]\.) (.*$)/, replacement: lexList('ol') },
   { regex: /^\s*$/, replacement: lexBlankLine }
 ];
 
@@ -65,7 +65,7 @@ function lexToken(type) {
   }
 }
 
-function createImage(_, before, altText, src, after) {
+function lexImage(_, before, altText, src, after) {
   const image = {
     type: "image",
     alt: lexSubline(altText.trim(), true),
@@ -74,7 +74,7 @@ function createImage(_, before, altText, src, after) {
   return lexSubline(before).concat([image], lexSubline(after));
 }
 
-function createLink(_, before, text, href, after) {
+function lexLink(_, before, text, href, after) {
   const image = {
     type: "link",
     text: lexSubline(text.trim(), true),
@@ -84,8 +84,8 @@ function createLink(_, before, text, href, after) {
 }
 
 const nonNestingSublineRules = [
-  { regex: /^(.*)!\[([^\]]+)\]\(([^\)]+)\)(.*)$/, replacement: createImage },
-  { regex: /^(.*)\[([^\]]+)\]\(([^\)]+)\)(.*)$/, replacement: createLink }
+  { regex: /^(.*)!\[([^\]]+)\]\(([^\)]+)\)(.*)$/, replacement: lexImage },
+  { regex: /^(.*)\[([^\]]+)\]\(([^\)]+)\)(.*)$/, replacement: lexLink }
 ];
 
 const sublineRules = [
