@@ -42,3 +42,4 @@ come in the middle?
 
 1. Item 3
 
+**nested bold *and italics** within each other*

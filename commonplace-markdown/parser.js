@@ -10,9 +10,8 @@ function parseLexemes(remainingLexemes) {
   let result = [];
 
   while (remainingLexemes.length > 0) {
-    const {product, remainder} = process(remainingLexemes);
+    const product = process(remainingLexemes);
     result = result.concat(product);
-    remainingLexemes = remainder;
   }
 
   return result;
@@ -37,17 +36,23 @@ function process(lexemes) {
     case "ul":
       result = parseList("ul", head, lexemes);
       break;
-      case "ol":
-        result = parseList("ol", head, lexemes);
-        break;
+    case "ol":
+      result = parseList("ol", head, lexemes);
+      break;
+    case "bold":
+      result = parseEmphasis(head, lexemes);
+      break;
+    case "italic":
+      result = parseEmphasis(head, lexemes);
+      break;
     case "text":
-      result = { product: [head], remainder: lexemes };
+      result = [head];
       break;
     case "text line":
       result = parseTextLine(head, lexemes);
       break;
     case "blank line":
-      result = { product: [], lexemes };
+      result = [];
       break;
     default:
       throw new Error("Bad type: " + head.type);
@@ -56,36 +61,27 @@ function process(lexemes) {
   return result;
 }
 
-function parseHeading(heading, remainder) {
+function parseHeading(heading) {
   return {
-    product: [{
-      type: "heading",
-      level: heading.level,
-      content: parseLexemes(heading.content)
-    }],
-    remainder
+    type: "heading",
+    level: heading.level,
+    content: parseLexemes(heading.content)
   };
 }
 
-function parseImage(img, remainder) {
+function parseImage(img) {
   return {
-    product: [{
-      type: "image",
-      alt: parseLexemes(img.alt),
-      src: img.src
-    }],
-    remainder
+    type: "image",
+    alt: parseLexemes(img.alt),
+    src: img.src
   };
 }
 
-function parseLink(link, remainder) {
+function parseLink(link) {
   return {
-    product: [{
-      type: "link",
-      text: parseLexemes(link.text),
-      href: link.href
-    }],
-    remainder
+    type: "link",
+    text: parseLexemes(link.text),
+    href: link.href
   };
 }
 
@@ -96,11 +92,8 @@ function parseTextLine(line, remainder) {
   }
 
   return {
-    product: [{
-      type: "paragraph",
-      content: parseLexemes(acc)
-    }],
-    remainder
+    type: "paragraph",
+    content: parseLexemes(acc)
   };
 }
 
@@ -121,12 +114,9 @@ function parseList(listType, item, remainder) {
   }
 
   return {
-    product: [{
-      type: listType,
-      items,
-      indent
-    }],
-    remainder
+    type: listType,
+    items,
+    indent
   };
 }
 
@@ -141,4 +131,41 @@ function parseListItem(start, remainder) {
     content: parseLexemes(acc),
     marker: start.marker
   };
+}
+
+function parseEmphasis(start, remainder) {
+  let i = 0;
+  
+  while (i < remainder.length) {
+    if (remainder[i].type === start.type) {
+      
+      const emphasisedItems = [];
+
+      for(let j = 0; j < i; ++j) {
+        emphasisedItems.push(remainder.shift());
+      }
+      remainder.shift();
+
+      if (emphasisedItems.length === 0) {
+        return { type: "text", content: emphasisMarker(start.type) + emphasisMarker(start.type) };
+      }
+
+      return {
+        type: start.type,
+        content: parseLexemes(emphasisedItems)
+      };
+    }
+    ++i;
+  }
+
+  return {
+    type: "text",
+    content: emphasisMarker(start.type)
+  };
+}
+
+function emphasisMarker(type) {
+  if (type === "bold") return "**";
+  if (type === "italic") return "*";
+  throw new Error("Invalid emphasis type: " + type);
 }

@@ -7,23 +7,29 @@ describe("parser", () => {
     expect(res).toEqual([{ type: "heading", level: 1, content: [{type:"text", content: "a heading"}]}]);
   });
 
-  // test("bold", () => {
-  //   const res = parse("before **bolded** after");
-  //   expect(res).toEqual([
-  //     {type: "text", content: "before "},
-  //     {type: "bold", content: [{type:"text", content: "bolded"}]},
-  //     {type: "text", content: " after"}
-  //   ]);
-  // });
+  test("bold", () => {
+    const res = parse("before **bolded** after");
+    expect(res).toEqual([{
+      type: "paragraph",
+      content: [
+        {type: "text", content: "before "},
+        {type: "bold", content: [{type:"text", content: "bolded"}]},
+        {type: "text", content: " after"}
+      ]
+    }]);
+  });
 
-  // test("italic", () => {
-  //   const res = parse("before *italicized* after");
-  //   expect(res).toEqual([
-  //     {type: "text", content: "before "},
-  //     {type: "italic", content: [{type:"text", content: "italicized"}]},
-  //     {type: "text", content: " after"}
-  //   ]);
-  // });
+  test("italic", () => {
+    const res = parse("before *italicized* after");
+    expect(res).toEqual([{
+      type: "paragraph",
+      content: [
+        {type: "text", content: "before "},
+        {type: "italic", content: [{type:"text", content: "italicized"}]},
+        {type: "text", content: " after"}
+      ]
+    }]);
+  });
 
   test("link", () => {
     const res = parse("before [link text](link href) after");
