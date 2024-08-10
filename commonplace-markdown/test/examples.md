@@ -1,3 +1,5 @@
+
+
 # heading **with bold** *and italics*
 #     heading more spaces
 
@@ -22,3 +24,21 @@
 
 - one
 1. two
+
+**Does bold work
+across lines?**
+
+**What about across
+
+paragraphs?**
+
+Can a list
+ - item
+come in the middle?
+
+1. Item 1
+1. Item 2
+
+
+1. Item 3
+
