@@ -3,14 +3,23 @@
 # heading **with bold** *and italics*
 #     heading more spaces
 
-[  Link with **bold** in it  ](  and **broken** href  )
+ # heading proceeded by space
 
-[       Link with **bold** in it  ](andmeaningfulhref)
+#no space
+
+# heading
+continuing to next line
+
+  [  Link with **bold** in it  ](  and **broken** href  )
+
+  [       Link with **bold** in it  ](andmeaningfulhref)
 
 **[Link contained in bold](link)**
 
 [Link split
 over lines](link)
+
+[Link inside [link](bar)](foo)
 
 * item
   - item
@@ -46,3 +55,5 @@ come in the middle?
 1. Item 3
 
 **nested bold *and italics** within each other*
+
+ -

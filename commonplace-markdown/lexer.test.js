@@ -3,54 +3,58 @@ import { lex } from "./lexer.js";
 
 describe("lexer", () => {
   test("heading level 1", () => {
-    expect(lex("# a heading")).toEqual([{type: "heading", level: 1, content: [{ type: "text", content: "a heading"}]}]);
+    expect(lex("# a heading")).toEqual([{type: "heading", level: 1, content: [{ type: "text", content: [2, 10]}]}]);
   });
 
   test("heading level 2", () => {
-    expect(lex("## a heading")).toEqual([{type: "heading", level: 2, content: [{ type: "text", content: "a heading"}]}]);
+    expect(lex("## a heading")).toEqual([{type: "heading", level: 2, content: [{ type: "text", content: [3, 11]}]}]);
   });
 
-  test("ul", () => {
-    expect(lex("  * bullet point")).toEqual([{type: "ul", marker: "*", indent: 2, content: [{ type: "text", content: "bullet point"}]}]);
+  test("ul - star", () => {
+    expect(lex("  * bullet point")).toEqual([{type: "ul", marker: [2, 2], indent: 2, content: [{ type: "text", content: [4, 15]}]}]);
+  });
+
+  test("ul - dash", () => {
+    expect(lex("  - bullet point")).toEqual([{type: "ul", marker: [2, 2], indent: 2, content: [{ type: "text", content: [4, 15]}]}]);
   });
 
   test("ol", () => {
-    expect(lex("  5. bullet point")).toEqual([{type: "ol", marker: "5.", indent: 2, content: [{ type: "text", content: "bullet point"}]}]);
+    expect(lex("  5. bullet point")).toEqual([{type: "ol", marker: [2, 3], indent: 2, content: [{ type: "text", content: [5, 16]}]}]);
   });
 
   test("image", () => {
     expect(lex("before ![alt text](srctext) after")).toEqual([{
       type: "text line",
       content: [
-        { type: "text", content: "before " },
-        { type: "image", alt: [{type: "text", content: "alt text"}], src: "srctext" },
-        { type: "text", content: " after"}]}]);
+        { type: "text", content: [0, 6] },
+        { type: "image", alt: [{type: "text", content: [9, 16]}], src: [19, 25] },
+        { type: "text", content: [27, 32]}]}]);
   });
 
   test("link", () => {
     expect(lex("before [link text](linkhref) after")).toEqual([{
       type: "text line",
       content: [
-        { type: "text", content: "before " },
-        { type: "link", text: [{type: "text", content: "link text"}], href: "linkhref" },
-        { type: "text", content: " after"}]}]);
+        { type: "text", content: [0, 6] },
+        { type: "link", text: [{type: "text", content: [8, 16]}], href: [19, 26] },
+        { type: "text", content: [28, 33]}]}]);
   });
 
   test("bold", () => {
     expect(lex("before ** after")).toEqual([{
       type: "text line",
       content: [
-        { type: "text", content: "before " },
+        { type: "text", content: [0, 6] },
         { type: "bold" },
-        { type: "text", content: " after"}]}]);
+        { type: "text", content: [9, 14]}]}]);
   });
 
   test("italic", () => {
     expect(lex("before * after")).toEqual([{
       type: "text line",
       content: [
-        { type: "text", content: "before " },
+        { type: "text", content: [0, 6] },
         { type: "italic" },
-        { type: "text", content: " after"}]}]);
+        { type: "text", content: [8, 13]}]}]);
   });
 });
