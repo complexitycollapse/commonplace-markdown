@@ -4,7 +4,7 @@ import { parse } from "./parser.js";
 describe("parser", () => {
   test("heading", () => {
     const res = parse("# a heading");
-    expect(res).toEqual([{ type: "heading", level: 1, content: [{type:"text", content: "a heading"}]}]);
+    expect(res).toEqual([{type: "heading", level: 1, content: [{ type: "text", content: [2, 10]}]}]);
   });
 
   test("bold", () => {
@@ -12,9 +12,11 @@ describe("parser", () => {
     expect(res).toEqual([{
       type: "paragraph",
       content: [
-        {type: "text", content: "before "},
-        {type: "bold", content: [{type:"text", content: "bolded"}]},
-        {type: "text", content: " after"}
+        { type: "text", content: [0, 6] },
+        { type: "bold",
+          content: [{type: "text", content: [9, 14]}]
+         },
+        { type: "text", content: [17, 22]}
       ]
     }]);
   });
@@ -24,21 +26,23 @@ describe("parser", () => {
     expect(res).toEqual([{
       type: "paragraph",
       content: [
-        {type: "text", content: "before "},
-        {type: "italic", content: [{type:"text", content: "italicized"}]},
-        {type: "text", content: " after"}
+        { type: "text", content: [0, 6] },
+        { type: "italic",
+          content: [{type: "text", content: [8, 17]}]
+         },
+        { type: "text", content: [19, 24]}
       ]
     }]);
   });
 
   test("link", () => {
-    const res = parse("before [link text](link href) after");
+    const res = parse("before [link text](linkhref) after");
     expect(res).toEqual([{
       type: "paragraph",
       content: [
-        {type: "text", content: "before "},
-        {type: "link", text: [{type: "text", content: "link text"}], href: "link href"},
-        {type: "text", content: " after"}
+        {type: "text", content: [0, 6]},
+        {type: "link", text: [{type: "text", content: [8, 16]}], href: [19, 26]},
+        {type: "text", content: [28, 33]}
       ]
     }]);
   });
@@ -48,9 +52,9 @@ describe("parser", () => {
     expect(res).toEqual([{
       type: "paragraph",
       content: [
-        {type: "text", content: "before "},
-        {type: "image", alt: [{type: "text", content: "alt text"}], src: "src"},
-        {type: "text", content: " after"}
+        {type: "text", content: [0, 6]},
+        {type: "image", alt: [{type: "text", content: [9, 16]}], src: [19, 21]},
+        {type: "text", content: [23, 28]}
       ]
     }]);
   });
@@ -60,7 +64,7 @@ describe("parser", () => {
     expect(res).toEqual([{
       type: "ul",
       indent: 4,
-      items: [{type: "li", marker: "-", content: [{type: "text", content: "the bullet point"}]}]
+      items: [{type: "li", marker: [4, 4], content: [{type: "text", content: [6, 21]}]}]
     }]);
   });
 
@@ -69,7 +73,20 @@ describe("parser", () => {
     expect(res).toEqual([{
       type: "ul",
       indent: 4,
-      items: [{type: "li", marker: "*", content: [{type: "text", content: "the bullet point"}]}]
+      items: [{type: "li", marker: [4, 4], content: [{type: "text", content: [6, 21]}]}]
+    }]);
+  });
+
+  test("ul - list", () => {
+    const res = parse("- point 1\n- point 2\n- point 3");
+    expect(res).toEqual([{
+      type: "ul",
+      indent: 0,
+      items: [
+        {type: "li", marker: [0, 0], content: [{type: "text", content: [2, 8]}]},
+        {type: "li", marker: [10, 10], content: [{type: "text", content: [12, 18]}]},
+        {type: "li", marker: [20, 20], content: [{type: "text", content: [22, 28]}]}
+      ]
     }]);
   });
 
@@ -78,7 +95,7 @@ describe("parser", () => {
     expect(res).toEqual([{
       type: "ol",
       indent: 4,
-      items: [{type: "li", marker: "1.", content: [{type: "text", content: "the bullet point"}]}]
+      items: [{type: "li", marker: [4, 5], content: [{type: "text", content: [7, 22]}]}]
     }]);
   });
 });

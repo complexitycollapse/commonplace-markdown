@@ -37,7 +37,7 @@ function lexList(type) {
   return (str, indentSpan, marker, space, content) => {
     return {
       type,
-      indent: indentSpan[1] - indentSpan[0] + 1,
+      indent: indentSpan[0] <= indentSpan[1] ? indentSpan[1] - indentSpan[0] + 1 : 0,
       marker,
       content: subLineLex(str, content)
     };
@@ -49,9 +49,9 @@ function lexBlankLine() {
 }
 
 const lineRules = [
-  { regex: /(\s*)(#+)( )(.*)((\r?\n)|$)/g, replacement: lexHeading },
-  { regex: /( *)(\*|-)( )(.*)((\r?\n)|$)/g, replacement: lexList('ul') },
-  { regex: /( *)([0-9]+\.)( )(.*)((\r?\n)|$)/g, replacement: lexList('ol') },
+  { regex: /(\s*)(#+)( )(.*)(?:(?:\r?\n)|$)/g, replacement: lexHeading },
+  { regex: /( *)(\*|-)( )(.*)(?:(?:\r?\n)|$)/g, replacement: lexList('ul') },
+  { regex: /( *)([0-9]+\.)( )(.*)(?:(?:\r?\n)|$)/g, replacement: lexList('ol') },
   { regex: /(\s*\n)/g, replacement: lexBlankLine }
 ];
 
@@ -64,7 +64,7 @@ export function lex(str) {
 function lexLineSpan(str, span) {
   for (const rule of lineRules) {
     const match = spanMatch(rule.regex, str, span);
-    if (match && match.startIndex === 0) {
+    if (match && match.startIndex === span[0]) {
       const product = rule.replacement(str, ...match);
       return product;
     }
@@ -82,10 +82,10 @@ function getLineSpans(str) {
       spans.push([index, str.length - 1]);
       break;
     }
-    const end = unix === -1 ? win : (win === -1 ? unix : Math.min(unix, win));
+    let end = unix === -1 ? win : (win === -1 ? unix : Math.min(unix, win));
     end += str[end] === "\n" ? 0 : 1;
-    spans.push([index, end - 1]);
-    index = end + str[end] === "\n" ? 2 : 3;
+    spans.push([index, end]);
+    index = end + 1;
   }
 
   return spans;
@@ -116,9 +116,9 @@ function lexLink(match, str, span, openSquare, text, closeAndOpen, href, closeRo
 }
 
 function lexToken(type) {
-  return (match, str, span) =>{
+  return (match, str, span, marker) =>{
     const before = subLineLex(str, [span[0], match.startIndex - 1]);
-    return before.concat([{ type }], subLineLex(str, [match.lastIndex, span[1]]));
+    return before.concat([{ type, marker }], subLineLex(str, [match.lastIndex, span[1]]));
   }
 }
 

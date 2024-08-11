@@ -62,46 +62,49 @@ function process(lexemes) {
 }
 
 function parseHeading(heading) {
-  return {
+  return [{
     type: "heading",
     level: heading.level,
     content: parseLexemes(heading.content)
-  };
+  }];
 }
 
 function parseImage(img) {
-  return {
+  return [{
     type: "image",
     alt: parseLexemes(img.alt),
     src: img.src
-  };
+  }];
 }
 
 function parseLink(link) {
-  return {
+  return [{
     type: "link",
     text: parseLexemes(link.text),
     href: link.href
-  };
+  }];
 }
 
 function parseTextLine(line, remainder) {
-  let acc = line.content;
+  return [{
+    type: "paragraph",
+    content: parseUntilNextBlock(line.content, remainder)
+  }];
+}
+
+function parseUntilNextBlock(acc, remainder) {
   while(remainder.length > 0 && inlineType(remainder[0].type)) {
-    acc = acc.concat(remainder.shift().content);
+    acc = acc.concat(remainder.shift());
   }
 
-  return {
-    type: "paragraph",
-    content: parseLexemes(acc)
-  };
+  return parseLexemes(acc);
 }
 
 function parseList(listType, item, remainder) {
   remainder.unshift(item);
   const items = [], indent = item.indent;
   
-  while (remainder.length > 0 && (remainder[0].type === listType || remainder[0].type === "blank line")) {
+  while (remainder.length > 0 && remainder[0].type === listType) {
     if (remainder[0].type === "blank line") {
       remainder.shift();
     } else if (indent === remainder[0].indent) {
@@ -115,22 +118,17 @@ function parseList(listType, item, remainder) {
     }
   }
 
-  return {
+  return [{
     type: listType,
     items,
     indent
-  };
+  }];
 }
 
 function parseListItem(start, remainder) {
-  let acc = start.content;
-  while(remainder.length > 0 && remainder[0].type === "text line") {
-    acc = acc.concat(remainder.shift()?.content ?? []);
-  }
-
   return {
     type: "li",
-    content: parseLexemes(acc),
+    content: parseUntilNextBlock(start.content, remainder),
     marker: start.marker
   };
 }
@@ -139,37 +137,34 @@ function parseEmphasis(start, remainder) {
   let i = 0;
   
   while (i < remainder.length) {
-    if (remainder[i].type === start.type || remainder[i].type === "blank line") {
+    if (remainder[i].type === "blank line") return [{ type: "text", content: start.marker }];
+
+    if (remainder[i].type === start.type) {
       
       const emphasisedItems = [];
 
       for(let j = 0; j < i; ++j) {
         emphasisedItems.push(remainder.shift());
       }
-      remainder.shift();
 
       if (emphasisedItems.length === 0) {
-        return { type: "text", content: emphasisMarker(start.type) + emphasisMarker(start.type) };
+        return { type: "text", content: [start.marker[0], remainder[0].marker[1]] };
       }
 
-      return {
+      remainder.shift();
+
+      return [{
         type: start.type,
         content: parseLexemes(emphasisedItems)
-      };
+      }];
     }
     ++i;
   }
 
-  return {
+  return [{
     type: "text",
-    content: emphasisMarker(start.type)
-  };
-}
-
-function emphasisMarker(type) {
-  if (type === "bold") return "**";
-  if (type === "italic") return "*";
-  throw new Error("Invalid emphasis type: " + type);
+    content: start.marker
+  }];
 }
 
 function inlineType(type) {

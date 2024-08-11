@@ -56,4 +56,13 @@ come in the middle?
 
 **nested bold *and italics** within each other*
 
+**
+hello
+**
+
+other ****
+stuff ** **
+
+** emph **
+
  -

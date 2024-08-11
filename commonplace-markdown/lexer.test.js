@@ -45,7 +45,7 @@ describe("lexer", () => {
       type: "text line",
       content: [
         { type: "text", content: [0, 6] },
-        { type: "bold" },
+        { type: "bold", marker: [7, 8] },
         { type: "text", content: [9, 14]}]}]);
   });
 
@@ -54,7 +54,7 @@ describe("lexer", () => {
       type: "text line",
       content: [
         { type: "text", content: [0, 6] },
-        { type: "italic" },
+        { type: "italic", marker: [7, 7] },
         { type: "text", content: [8, 13]}]}]);
   });
 });
