@@ -87,7 +87,7 @@ function parseLink(link) {
 
 function parseTextLine(line, remainder) {
   let acc = line.content;
-  while(remainder.length > 0 && remainder[0].type === "text line") {
+  while(remainder.length > 0 && inlineType(remainder[0].type)) {
     acc = acc.concat(remainder.shift().content);
   }
 
@@ -101,8 +101,10 @@ function parseList(listType, item, remainder) {
   remainder.unshift(item);
   const items = [], indent = item.indent;
   
-  while (remainder.length > 0 && remainder[0].type === listType) {
-    if (indent === remainder[0].indent) {
+  while (remainder.length > 0 && (remainder[0].type === listType || remainder[0].type === "blank line")) {
+    if (remainder[0].type === "blank line") {
+      remainder.shift();
+    } else if (indent === remainder[0].indent) {
       const parsedItem = parseListItem(remainder.shift(), remainder);
       items.push(parsedItem);
     } else if (indent < remainder[0].indent) {
@@ -122,7 +124,7 @@ function parseList(listType, item, remainder) {
 
 function parseListItem(start, remainder) {
   let acc = start.content;
-  while(remainder.length > 0 && (remainder[0].type === "text line" || remainder[0].type === "blank line")) {
+  while(remainder.length > 0 && remainder[0].type === "text line") {
     acc = acc.concat(remainder.shift()?.content ?? []);
   }
 
@@ -137,7 +139,7 @@ function parseEmphasis(start, remainder) {
   let i = 0;
   
   while (i < remainder.length) {
-    if (remainder[i].type === start.type) {
+    if (remainder[i].type === start.type || remainder[i].type === "blank line") {
       
       const emphasisedItems = [];
 
@@ -168,4 +170,8 @@ function emphasisMarker(type) {
   if (type === "bold") return "**";
   if (type === "italic") return "*";
   throw new Error("Invalid emphasis type: " + type);
+}
+
+function inlineType(type) {
+  return ["text", "bold", "italic", "link", "image"].includes(type);
 }
