@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "just": "file:../../just/just"
+    "@commonplace/core": "^0.0.1",
+    "@commonplace/document-model": "^0.0.1",
+    "@complexitycollapse/just": "^1.0.0"
   }
 }
