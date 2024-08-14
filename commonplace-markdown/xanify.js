@@ -1,5 +1,5 @@
 import { Link, Span, Edl } from "@commonplace/core";
-import { paragraphType, documentType } from "@commonplace/document-model";
+import { paragraphType, documentType, strongType, emphasisType } from "@commonplace/document-model";
 
 export function xanify(originalContent, parsedData) {
   
@@ -13,7 +13,13 @@ export function xanify(originalContent, parsedData) {
 
     switch (product.type) {
       case "paragraph":
-        processParagraph(product);
+        linkForContent(paragraphType, product.content);
+        break;
+      case "bold":
+        linkForContent(strongType, product.content);
+        break;
+      case "italic":
+        linkForContent(emphasisType, product.content);
         break;
       case "text":
         // Nothing to do
@@ -23,11 +29,11 @@ export function xanify(originalContent, parsedData) {
     }
   }
 
-  function processParagraph(paragraph) {
-    const spans = getSpans(paragraph);
-    const plink = Link(paragraphType, [undefined, spans]);
+  function linkForContent(linkType, content) {
+    const spans = getSpans(content);
+    const plink = Link(linkType, [undefined, spans]);
     links.push(plink);
-    paragraph.content.map(processData);
+    content.map(processData);
   }
 
   const clips = parsedData.map(getSpans).flat();
@@ -38,6 +44,10 @@ export function xanify(originalContent, parsedData) {
 }
 
 function iterateSpans(product) {
+  if (Array.isArray(product)){
+    return product.map(iterateSpans).flat();
+  }
+
   switch (product.type) {
     case "paragraph":
     case "bold":
