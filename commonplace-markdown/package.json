@@ -1,5 +1,5 @@
 {
-  "name": "commonplace-markdown",
+  "name": "@complexitycollapse/commonplace-markdown",
   "version": "1.0.0",
   "description": "A package with tools for converting markdown to Commonplace",
   "main": "index.js",
